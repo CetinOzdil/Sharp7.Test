@@ -2109,8 +2109,9 @@ namespace Sharp7
 
         private int RecvIsoPacket()
         {
-            Boolean Done = false;
-            int Size = 0;
+            var Done = false;
+            var Size = 0;
+
             while ((_LastError == 0) && !Done)
             {
                 // Get TPKT (4 bytes)
@@ -2145,7 +2146,6 @@ namespace Sharp7
 
         private int ISOConnect()
         {
-            int Size;
             ISO_CR[16] = LocalTSAP_HI;
             ISO_CR[17] = LocalTSAP_LO;
             ISO_CR[20] = RemoteTSAP_HI;
@@ -2156,7 +2156,7 @@ namespace Sharp7
             if (_LastError == 0)
             {
                 // Gets the reply (if any)
-                Size = RecvIsoPacket();
+                var Size = RecvIsoPacket();
 
                 if (_LastError == 0)
                 {
@@ -2175,14 +2175,14 @@ namespace Sharp7
 
         private int NegotiatePduLength()
         {
-            int Length;
             // Set PDU Size Requested
             S7.SetWordAt(S7_PN, 23, (ushort)_PduSizeRequested);
             // Sends the connection request telegram
             SendPacket(S7_PN);
             if (_LastError == 0)
             {
-                Length = RecvIsoPacket();
+                var Length = RecvIsoPacket();
+
                 if (_LastError == 0)
                 {
                     // check S7 Error
@@ -2397,14 +2397,15 @@ namespace Sharp7
             int SizeRequested;
             int Length;
             int Offset = 0;
-            int WordSize = 1;
+            int WordSize;
 
             if (!Connected || _PDULength <= 0)
                 return S7Consts.errTCPNotConnected;
 
             _LastError = 0;
             Time_ms = 0;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
+
             // Some adjustment
             if (Area == S7Consts.S7AreaCT)
                 WordLen = S7Consts.S7WLCounter;
@@ -2516,14 +2517,15 @@ namespace Sharp7
             int IsoSize;
             int Length;
             int Offset = 0;
-            int WordSize = 1;
+            int WordSize;
 
             if (!Connected || _PDULength <= 0)
                 return S7Consts.errTCPNotConnected;
 
             _LastError = 0;
             Time_ms = 0;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
+
             // Some adjustment
             if (Area == S7Consts.S7AreaCT)
                 WordLen = S7Consts.S7WLCounter;
@@ -2653,15 +2655,15 @@ namespace Sharp7
             int Offset;
             int Length;
             int ItemSize;
-            byte[] S7Item = new byte[12];
-            byte[] S7ItemRead = new byte[1024];
+            var S7Item = new byte[12];
+            var S7ItemRead = new byte[1024];
 
             if (!Connected || _PDULength <= 0)
                 return S7Consts.errTCPNotConnected;
 
             _LastError = 0;
             Time_ms = 0;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
 
             // Checks items
             if (ItemsCount > MaxVars)
@@ -2756,15 +2758,15 @@ namespace Sharp7
             int ParLength;
             int DataLength;
             int ItemDataSize;
-            byte[] S7ParItem = new byte[S7_MWR_PARAM.Length];
-            byte[] S7DataItem = new byte[1024];
+            var S7ParItem = new byte[S7_MWR_PARAM.Length];
+            var S7DataItem = new byte[1024];
 
             if (!Connected || _PDULength <= 0)
                 return S7Consts.errTCPNotConnected;
 
             _LastError = 0;
             Time_ms = 0;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
 
             // Checks items
             if (ItemsCount > MaxVars)
@@ -2970,9 +2972,9 @@ namespace Sharp7
         {
             _LastError = 0;
             Time_ms = 0;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
 
-            ushort Sequence = GetNextWord();
+            var Sequence = GetNextWord();
 
             Array.Copy(S7_LIST_BLOCKS, 0, PDU, 0, S7_LIST_BLOCKS.Length);
             PDU[0x0b] = (byte)(Sequence & 0xff);
@@ -2980,15 +2982,17 @@ namespace Sharp7
 
             SendPacket(PDU, S7_LIST_BLOCKS.Length);
 
-            if (_LastError != 0) return _LastError;
-            int Length = RecvIsoPacket();
+            if (_LastError != 0) 
+                return _LastError;
+            
+            var Length = RecvIsoPacket();
             if (Length <= 32)// the minimum expected
             {
                 _LastError = S7Consts.errIsoInvalidPDU;
                 return _LastError;
             }
 
-            ushort Result = S7.GetWordAt(PDU, 27);
+            var Result = S7.GetWordAt(PDU, 27);
             if (Result != 0)
             {
                 _LastError = CpuError(Result);
@@ -2996,7 +3000,7 @@ namespace Sharp7
             }
 
             List = default(S7BlocksList);
-            int BlocksSize = S7.GetWordAt(PDU, 31);
+            var BlocksSize = S7.GetWordAt(PDU, 31);
 
             if (Length <= 32 + BlocksSize)
             {
@@ -3005,6 +3009,7 @@ namespace Sharp7
             }
 
             int BlocksCount = BlocksSize >> 2;
+
             for (int blockNum = 0; blockNum < BlocksCount; blockNum++)
             {
                 int Count = S7.GetWordAt(PDU, (blockNum << 2) + 35);
@@ -3044,7 +3049,7 @@ namespace Sharp7
 
         private string SiemensTimestamp(long EncodedDate)
         {
-            DateTime DT = new DateTime(1984, 1, 1).AddSeconds(EncodedDate * 86400);
+            var DT = new DateTime(1984, 1, 1).AddSeconds(EncodedDate * 86400);
 #if WINDOWS_UWP || NETFX_CORE || CORE_CLR
             return DT.ToString(System.Globalization.DateTimeFormatInfo.CurrentInfo.ShortDatePattern);
 #else
@@ -3056,7 +3061,7 @@ namespace Sharp7
         {
             _LastError = 0;
             Time_ms = 0;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
 
             S7_BI[30] = (byte)BlockType;
             // Block Number
@@ -3074,7 +3079,8 @@ namespace Sharp7
 
             if (_LastError == 0)
             {
-                int Length = RecvIsoPacket();
+                var Length = RecvIsoPacket();
+
                 if (Length > 32) // the minimum expected
                 {
                     ushort Result = S7.GetWordAt(PDU, 27);
@@ -3121,11 +3127,11 @@ namespace Sharp7
             byte In_Seq = 0;
             int Count = 0; //Block 1...n
             int PduLength;
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
 
             //Consequent packets have a different ReqData
-            byte[] ReqData = new byte[] { 0xff, 0x09, 0x00, 0x02, 0x30, (byte)BlockType };
-            byte[] ReqDataContinue = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00 };
+            var ReqData = new byte[] { 0xff, 0x09, 0x00, 0x02, 0x30, (byte)BlockType };
+            var ReqDataContinue = new byte[] { 0x00, 0x00, 0x00, 0x00, 0x0a, 0x00, 0x00, 0x00 };
 
             _LastError = 0;
             Time_ms = 0;
@@ -3133,7 +3139,7 @@ namespace Sharp7
             do
             {
                 PduLength = S7_LIST_BLOCKS_OF_TYPE.Length + ReqData.Length;
-                ushort Sequence = GetNextWord();
+                var Sequence = GetNextWord();
 
                 Array.Copy(S7_LIST_BLOCKS_OF_TYPE, 0, PDU, 0, S7_LIST_BLOCKS_OF_TYPE.Length);
                 S7.SetWordAt(PDU, 0x02, (ushort)PduLength);
@@ -3162,7 +3168,7 @@ namespace Sharp7
                     return _LastError;
                 }
 
-                ushort Result = S7.GetWordAt(PDU, 0x1b);
+                var Result = S7.GetWordAt(PDU, 0x1b);
                 if (Result != 0)
                 {
                     _LastError = CpuError(Result);
@@ -3347,10 +3353,10 @@ namespace Sharp7
 
         public int GetOrderCode(ref S7OrderCode Info)
         {
-            S7SZL SZL = new S7SZL();
+            var SZL = new S7SZL();
             int Size = 1024;
             SZL.Data = new byte[Size];
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
             _LastError = ReadSZL(0x0011, 0x000, ref SZL, ref Size);
             if (_LastError == 0)
             {
@@ -3366,10 +3372,10 @@ namespace Sharp7
 
         public int GetCpuInfo(ref S7CpuInfo Info)
         {
-            S7SZL SZL = new S7SZL();
+            var SZL = new S7SZL();
             int Size = 1024;
             SZL.Data = new byte[Size];
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
             _LastError = ReadSZL(0x001C, 0x000, ref SZL, ref Size);
             if (_LastError == 0)
             {
@@ -3386,10 +3392,10 @@ namespace Sharp7
 
         public int GetCpInfo(ref S7CpInfo Info)
         {
-            S7SZL SZL = new S7SZL();
+            var SZL = new S7SZL();
             int Size = 1024;
             SZL.Data = new byte[Size];
-            int Elapsed = Environment.TickCount;
+            var Elapsed = Environment.TickCount;
             _LastError = ReadSZL(0x0131, 0x001, ref SZL, ref Size);
             if (_LastError == 0)
             {
@@ -3408,8 +3414,8 @@ namespace Sharp7
             int Length;
             int DataSZL;
             int Offset = 0;
-            bool Done = false;
-            bool First = true;
+            var Done = false;
+            var First = true;
             byte Seq_in = 0x00;
             ushort Seq_out = 0x0000;
 
