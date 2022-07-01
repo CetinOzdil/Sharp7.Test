@@ -365,6 +365,8 @@ namespace Sharp7
         {
             tcpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
             tcpSocket.NoDelay = true;
+            tcpSocket.ReceiveTimeout = ReceiveTimeout;
+            tcpSocket.SendTimeout = SendTimeout;
 
             // Setup event args
             connectEventArgs = new SocketAsyncEventArgs();
@@ -381,15 +383,15 @@ namespace Sharp7
             switch (e.LastOperation)
             {
                 case SocketAsyncOperation.Send:
-                    LastError = SendCompleted(e);
+                    SendCompleted(e);
                     break;
 
                 case SocketAsyncOperation.Receive:
-                    LastError = ReceiveCompleted(e);
+                    ReceiveCompleted(e);
                     break;
 
                 case SocketAsyncOperation.Connect:
-                    LastError = ConnectCompleted(e);
+                    ConnectCompleted(e);
                     break;
 
             }
@@ -397,7 +399,7 @@ namespace Sharp7
 
         public int Connect(string Host, int Port)
         {
-            LastError = 0;
+            LastError = S7Consts.errTCPConnectionFailed; 
 
             if (!IsConnected)
             {
@@ -410,7 +412,7 @@ namespace Sharp7
                     connectEventArgs.RemoteEndPoint = new IPEndPoint(IPAddress.Parse(Host), Port);
 
                     if (!tcpSocket.ConnectAsync(connectEventArgs))
-                        LastError = ConnectCompleted(connectEventArgs);
+                        ConnectCompleted(connectEventArgs);
 
                     connectDone.WaitOne(ConnectTimeout);
                 }
@@ -423,21 +425,21 @@ namespace Sharp7
             return LastError;
         }
 
-        private int ConnectCompleted(SocketAsyncEventArgs e)
+        private void ConnectCompleted(SocketAsyncEventArgs e)
         {
-            connectDone.Set();
-
             if (e.SocketError == SocketError.Success)
             {
                 tcpSocket.SetSocketOption(SocketOptionLevel.Socket, SocketOptionName.KeepAlive, true);
                 tcpSocket.SetSocketOption(SocketOptionLevel.Tcp, SocketOptionName.NoDelay, true);
 
-                return 0;
+                LastError = 0;
             }
             else
             {
-                return S7Consts.errTCPConnectionFailed;
+                LastError = S7Consts.errTCPConnectionFailed;
             }
+
+            connectDone.Set();
         }
 
         public void Close()
@@ -475,7 +477,7 @@ namespace Sharp7
                 sendEventArgs.SetBuffer(Buffer, 0, Size);
 
                 if (!tcpSocket.SendAsync(sendEventArgs))
-                    LastError = SendCompleted(sendEventArgs);
+                    SendCompleted(sendEventArgs);
 
                 sendDone.WaitOne(SendTimeout);
             }
@@ -488,16 +490,17 @@ namespace Sharp7
             return LastError;
         }
 
-        private int SendCompleted(SocketAsyncEventArgs e)
+        private void SendCompleted(SocketAsyncEventArgs e)
         {
-            sendDone.Set();
-
             if (e.SocketError == SocketError.Success)
-                return 0;
+                LastError = 0;
             else
             {
-                return S7Consts.errTCPDataSend;
+                LastError = S7Consts.errTCPDataSend;
             }
+
+            sendDone.Set();
+
         }
 
         public int Receive(byte[] Buffer, int Start, int Size)
@@ -515,7 +518,7 @@ namespace Sharp7
                 receiveEventArgs.SetBuffer(Buffer, Start, Size);
 
                 if (!tcpSocket.ReceiveAsync(receiveEventArgs))
-                    LastError = ReceiveCompleted(receiveEventArgs);
+                    ReceiveCompleted(receiveEventArgs);
 
                 receiveDone.WaitOne(ReceiveTimeout);
 
@@ -530,21 +533,19 @@ namespace Sharp7
             return LastError;
         }
 
-        private int ReceiveCompleted(SocketAsyncEventArgs e)
+        private void ReceiveCompleted(SocketAsyncEventArgs e)
         {
-            receiveDone.Set();
-
             int receivedBytes = e.BytesTransferred;
 
             if (e.SocketError == SocketError.Success)
             {
                 if (receivedBytes >= receiveEventArgs.Count)
-                    return 0;
+                    LastError = 0;
                 else
-                    return S7Consts.errTCPDataReceive;
+                    LastError = S7Consts.errTCPDataReceive;
             }
 
-            return S7Consts.errTCPDataReceive;
+            receiveDone.Set();
         }
 
 
