@@ -8,7 +8,7 @@ In tests;
 - Sharp7_v110 refers to using lastest `Sharp7.cs`
 - Sharp7 refers to modified `Sharp7.cs`
 
-#### S7-1214 Test (Read 200 bytes from markers 1000 times)
+#### S7-1214 Test (Read 200 bytes 1000 times from markers)
 ```
 Snap7 200 bytes will be read 1000 times...
 OK
@@ -25,7 +25,7 @@ Sharp7 200 bytes 1000 times read in 12496 ms
 Test results from S7-1214 are nothing special.
 
 
-#### S7-410E Test (Read 200 bytes from markers 1000 times)
+#### S7-410E Test (Read 200 bytes 1000 times from markers)
 ```
 Snap7 200 bytes will be read 1000 times...
 OK
@@ -43,7 +43,7 @@ Test results from S7-410E are showing improvement;
 - %18 faster than Snap7
 - %34 faster than Sharp7 v1.1.0
 
-#### Snap7 Server Rich Demo Test (Read 200 bytes from DB1 1000 times)
+#### Snap7 Server Rich Demo Test (Read 200 bytes 1000 times from DB1)
 ```
 Snap7 200 bytes will be read 1000 times...
 OK
