@@ -49,7 +49,6 @@ using System.Threading;
 using System.Collections.Generic;
 using System.Linq;
 using System.IO;
-using System.Net;
 //------------------------------------------------------------------------------
 // If you are compiling for UWP verify that WINDOWS_UWP or NETFX_CORE are 
 // defined into Project Properties->Build->Conditional compilation symbols
@@ -60,6 +59,7 @@ using Windows.Networking;
 using Windows.Networking.Sockets;
 using Windows.Storage.Streams;
 #else // <-- Including MONO
+using System.Net;
 using System.Net.Sockets;
 #endif
 
