@@ -746,7 +746,7 @@ namespace Sharp7
     {
         #region [Help Functions]
 
-        private static Int64 bias = 621355968000000000; // "decimicros" between 0001-01-01 00:00:00 and 1970-01-01 00:00:00
+        private static long bias = 621355968000000000; // "decimicros" between 0001-01-01 00:00:00 and 1970-01-01 00:00:00
 
         private static int BCDtoByte(byte B)
         {
@@ -784,16 +784,16 @@ namespace Sharp7
         }
 
         #region Get/Set the bit at Pos.Bit
+        static byte[] Mask = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
+
         public static bool GetBitAt(byte[] Buffer, int Pos, int Bit)
         {
-            byte[] Mask = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
             if (Bit < 0) Bit = 0;
             if (Bit > 7) Bit = 7;
             return (Buffer[Pos] & Mask[Bit]) != 0;
         }
         public static void SetBitAt(ref byte[] Buffer, int Pos, int Bit, bool Value)
         {
-            byte[] Mask = { 0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80 };
             if (Bit < 0) Bit = 0;
             if (Bit > 7) Bit = 7;
 
@@ -816,8 +816,11 @@ namespace Sharp7
         }
         public static void SetSIntAt(byte[] Buffer, int Pos, int Value)
         {
-            if (Value < -128) Value = -128;
-            if (Value > 127) Value = 127;
+            if (Value < -128)
+                Value = -128;
+            else if (Value > 127) 
+                Value = 127;
+
             Buffer[Pos] = (byte)Value;
         }
         #endregion
@@ -827,7 +830,8 @@ namespace Sharp7
         {
             return (short)((Buffer[Pos] << 8) | Buffer[Pos + 1]);
         }
-        public static void SetIntAt(byte[] Buffer, int Pos, Int16 Value)
+
+        public static void SetIntAt(byte[] Buffer, int Pos, short Value)
         {
             Buffer[Pos] = (byte)(Value >> 8);
             Buffer[Pos + 1] = (byte)(Value & 0x00FF);
@@ -838,12 +842,16 @@ namespace Sharp7
         public static int GetDIntAt(byte[] Buffer, int Pos)
         {
             int Result;
-            Result = Buffer[Pos]; Result <<= 8;
-            Result += Buffer[Pos + 1]; Result <<= 8;
-            Result += Buffer[Pos + 2]; Result <<= 8;
+            Result = Buffer[Pos]; 
+            Result <<= 8;
+            Result += Buffer[Pos + 1]; 
+            Result <<= 8;
+            Result += Buffer[Pos + 2]; 
+            Result <<= 8;
             Result += Buffer[Pos + 3];
             return Result;
         }
+
         public static void SetDIntAt(byte[] Buffer, int Pos, int Value)
         {
             Buffer[Pos + 3] = (byte)(Value & 0xFF);
@@ -851,12 +859,13 @@ namespace Sharp7
             Buffer[Pos + 1] = (byte)((Value >> 16) & 0xFF);
             Buffer[Pos] = (byte)((Value >> 24) & 0xFF);
         }
+
         #endregion
 
         #region Get/Set 64 bit signed value (S7 LInt) -9223372036854775808..9223372036854775807
-        public static Int64 GetLIntAt(byte[] Buffer, int Pos)
+        public static long GetLIntAt(byte[] Buffer, int Pos)
         {
-            Int64 Result;
+            long Result;
             Result = Buffer[Pos]; Result <<= 8;
             Result += Buffer[Pos + 1]; Result <<= 8;
             Result += Buffer[Pos + 2]; Result <<= 8;
@@ -867,7 +876,7 @@ namespace Sharp7
             Result += Buffer[Pos + 7];
             return Result;
         }
-        public static void SetLIntAt(byte[] Buffer, int Pos, Int64 Value)
+        public static void SetLIntAt(byte[] Buffer, int Pos, long Value)
         {
             Buffer[Pos + 7] = (byte)(Value & 0xFF);
             Buffer[Pos + 6] = (byte)((Value >> 8) & 0xFF);
@@ -892,11 +901,11 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 16 bit unsigned value (S7 UInt) 0..65535
-        public static UInt16 GetUIntAt(byte[] Buffer, int Pos)
+        public static ushort GetUIntAt(byte[] Buffer, int Pos)
         {
-            return (UInt16)((Buffer[Pos] << 8) | Buffer[Pos + 1]);
+            return (ushort)((Buffer[Pos] << 8) | Buffer[Pos + 1]);
         }
-        public static void SetUIntAt(byte[] Buffer, int Pos, UInt16 Value)
+        public static void SetUIntAt(byte[] Buffer, int Pos, ushort Value)
         {
             Buffer[Pos] = (byte)(Value >> 8);
             Buffer[Pos + 1] = (byte)(Value & 0x00FF);
@@ -904,16 +913,16 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 32 bit unsigned value (S7 UDInt) 0..4294967296
-        public static UInt32 GetUDIntAt(byte[] Buffer, int Pos)
+        public static uint GetUDIntAt(byte[] Buffer, int Pos)
         {
-            UInt32 Result;
+            uint Result;
             Result = Buffer[Pos]; Result <<= 8;
             Result |= Buffer[Pos + 1]; Result <<= 8;
             Result |= Buffer[Pos + 2]; Result <<= 8;
             Result |= Buffer[Pos + 3];
             return Result;
         }
-        public static void SetUDIntAt(byte[] Buffer, int Pos, UInt32 Value)
+        public static void SetUDIntAt(byte[] Buffer, int Pos, uint Value)
         {
             Buffer[Pos + 3] = (byte)(Value & 0xFF);
             Buffer[Pos + 2] = (byte)((Value >> 8) & 0xFF);
@@ -923,9 +932,9 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 64 bit unsigned value (S7 ULint) 0..18446744073709551616
-        public static UInt64 GetULIntAt(byte[] Buffer, int Pos)
+        public static ulong GetULIntAt(byte[] Buffer, int Pos)
         {
-            UInt64 Result;
+            ulong Result;
             Result = Buffer[Pos]; Result <<= 8;
             Result |= Buffer[Pos + 1]; Result <<= 8;
             Result |= Buffer[Pos + 2]; Result <<= 8;
@@ -936,7 +945,7 @@ namespace Sharp7
             Result |= Buffer[Pos + 7];
             return Result;
         }
-        public static void SetULintAt(byte[] Buffer, int Pos, UInt64 Value)
+        public static void SetULintAt(byte[] Buffer, int Pos, ulong Value)
         {
             Buffer[Pos + 7] = (byte)(Value & 0xFF);
             Buffer[Pos + 6] = (byte)((Value >> 8) & 0xFF);
@@ -961,46 +970,47 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 16 bit word (S7 Word) 16#0000..16#FFFF
-        public static UInt16 GetWordAt(byte[] Buffer, int Pos)
+        public static ushort GetWordAt(byte[] Buffer, int Pos)
         {
             return GetUIntAt(Buffer, Pos);
         }
-        public static void SetWordAt(byte[] Buffer, int Pos, UInt16 Value)
+        public static void SetWordAt(byte[] Buffer, int Pos, ushort Value)
         {
             SetUIntAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 32 bit word (S7 DWord) 16#00000000..16#FFFFFFFF
-        public static UInt32 GetDWordAt(byte[] Buffer, int Pos)
+        public static uint GetDWordAt(byte[] Buffer, int Pos)
         {
             return GetUDIntAt(Buffer, Pos);
         }
-        public static void SetDWordAt(byte[] Buffer, int Pos, UInt32 Value)
+        public static void SetDWordAt(byte[] Buffer, int Pos, uint Value)
         {
             SetUDIntAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 64 bit word (S7 LWord) 16#0000000000000000..16#FFFFFFFFFFFFFFFF
-        public static UInt64 GetLWordAt(byte[] Buffer, int Pos)
+        public static ulong GetLWordAt(byte[] Buffer, int Pos)
         {
             return GetULIntAt(Buffer, Pos);
         }
-        public static void SetLWordAt(byte[] Buffer, int Pos, UInt64 Value)
+        public static void SetLWordAt(byte[] Buffer, int Pos, ulong Value)
         {
             SetULintAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 32 bit floating point number (S7 Real) (Range of Single)
-        public static Single GetRealAt(byte[] Buffer, int Pos)
+        public static float GetRealAt(byte[] Buffer, int Pos)
         {
-            UInt32 Value = GetUDIntAt(Buffer, Pos);
+            uint Value = GetUDIntAt(Buffer, Pos);
             byte[] bytes = BitConverter.GetBytes(Value);
             return BitConverter.ToSingle(bytes, 0);
         }
-        public static void SetRealAt(byte[] Buffer, int Pos, Single Value)
+
+        public static void SetRealAt(byte[] Buffer, int Pos, float Value)
         {
             byte[] FloatArray = BitConverter.GetBytes(Value);
             Buffer[Pos] = FloatArray[3];
@@ -1011,13 +1021,13 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 64 bit floating point number (S7 LReal) (Range of Double)
-        public static Double GetLRealAt(byte[] Buffer, int Pos)
+        public static double GetLRealAt(byte[] Buffer, int Pos)
         {
-            UInt64 Value = GetULIntAt(Buffer, Pos);
+            ulong Value = GetULIntAt(Buffer, Pos);
             byte[] bytes = BitConverter.GetBytes(Value);
             return BitConverter.ToDouble(bytes, 0);
         }
-        public static void SetLRealAt(byte[] Buffer, int Pos, Double Value)
+        public static void SetLRealAt(byte[] Buffer, int Pos, double Value)
         {
             byte[] FloatArray = BitConverter.GetBytes(Value);
             Buffer[Pos] = FloatArray[7];
@@ -1098,7 +1108,7 @@ namespace Sharp7
         }
         public static void SetDateAt(byte[] Buffer, int Pos, DateTime Value)
         {
-            SetIntAt(Buffer, Pos, (Int16)(Value - new DateTime(1990, 1, 1)).Days);
+            SetIntAt(Buffer, Pos, (short)(Value - new DateTime(1990, 1, 1)).Days);
         }
 
         #endregion
@@ -1118,7 +1128,7 @@ namespace Sharp7
         public static void SetTODAt(byte[] Buffer, int Pos, DateTime Value)
         {
             TimeSpan Time = Value.TimeOfDay;
-            SetDIntAt(Buffer, Pos, (Int32)Math.Round(Time.TotalMilliseconds));
+            SetDIntAt(Buffer, Pos, (int)Math.Round(Time.TotalMilliseconds));
         }
         #endregion
 
@@ -1319,7 +1329,7 @@ namespace Sharp7
 
         public static void SetS7TimespanAt(byte[] Buffer, int Pos, TimeSpan Value)
         {
-            SetDIntAt(Buffer, Pos, (Int32)Value.TotalMilliseconds);
+            SetDIntAt(Buffer, Pos, (int)Value.TotalMilliseconds);
         }
 
         public static TimeSpan GetS7TimespanAt(byte[] Buffer, int pos)
@@ -1429,12 +1439,12 @@ namespace Sharp7
             return Add(Tag.Area, Tag.WordLen, Tag.DBNumber, Tag.Start, Tag.Elements, ref Buffer);
         }
 
-        public bool Add<T>(Int32 Area, int WordLen, int DBNumber, int Start, int Amount, ref T[] Buffer)
+        public bool Add<T>(int Area, int WordLen, int DBNumber, int Start, int Amount, ref T[] Buffer)
         {
             return Add(Area, WordLen, DBNumber, Start, Amount, ref Buffer, 0);
         }
 
-        public bool Add<T>(Int32 Area, int WordLen, int DBNumber, int Start, int Amount, ref T[] Buffer, int Offset)
+        public bool Add<T>(int Area, int WordLen, int DBNumber, int Start, int Amount, ref T[] Buffer, int Offset)
         {
             if (Count < S7Client.MaxVars)
             {
@@ -1584,9 +1594,9 @@ namespace Sharp7
         const ushort Code7DataOverPDU = 0x8500;
 
         // Client Connection Type
-        public static readonly UInt16 CONNTYPE_PG = 0x01;  // Connect to the PLC as a PG
-        public static readonly UInt16 CONNTYPE_OP = 0x02;  // Connect to the PLC as an OP
-        public static readonly UInt16 CONNTYPE_BASIC = 0x03;  // Basic connection 
+        public static readonly ushort CONNTYPE_PG = 0x01;  // Connect to the PLC as a PG
+        public static readonly ushort CONNTYPE_OP = 0x02;  // Connect to the PLC as an OP
+        public static readonly ushort CONNTYPE_BASIC = 0x03;  // Basic connection 
 
         public int _LastError = 0;
 
@@ -1667,8 +1677,8 @@ namespace Sharp7
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
         public struct SZL_HEADER
         {
-            public UInt16 LENTHDR;
-            public UInt16 N_DR;
+            public ushort LENTHDR;
+            public ushort N_DR;
         };
 
         [StructLayout(LayoutKind.Sequential, Pack = 1)]
@@ -1685,7 +1695,7 @@ namespace Sharp7
         {
             public SZL_HEADER Header;
             [MarshalAs(UnmanagedType.ByValArray, SizeConst = 0x2000 - 2)]
-            public UInt16[] Data;
+            public ushort[] Data;
         };
 
         // S7 Protection
@@ -2255,7 +2265,7 @@ namespace Sharp7
 
         public int ConnectTo(string Address, int Rack, int Slot)
         {
-            UInt16 RemoteTSAP = (UInt16)((ConnType << 8) + (Rack * 0x20) + Slot);
+            ushort RemoteTSAP = (ushort)((ConnType << 8) + (Rack * 0x20) + Slot);
             SetConnectionParams(Address, 0x0100, RemoteTSAP);
             return Connect();
         }
@@ -2284,7 +2294,7 @@ namespace Sharp7
             return 0;
         }
 
-        public int GetParam(Int32 ParamNumber, ref int Value)
+        public int GetParam(int ParamNumber, ref int Value)
         {
             int Result = 0;
             switch (ParamNumber)
@@ -2324,7 +2334,7 @@ namespace Sharp7
         }
 
         // Set Properties for compatibility with Snap7.net.cs
-        public int SetParam(Int32 ParamNumber, ref int Value)
+        public int SetParam(int ParamNumber, ref int Value)
         {
             int Result = 0;
             switch (ParamNumber)
@@ -3580,12 +3590,12 @@ namespace Sharp7
             return _LastError;
         }
 
-        public int PlcCopyRamToRom(UInt32 Timeout)
+        public int PlcCopyRamToRom(uint Timeout)
         {
             return S7Consts.errCliFunctionNotImplemented;
         }
 
-        public int PlcCompress(UInt32 Timeout)
+        public int PlcCompress(uint Timeout)
         {
             return S7Consts.errCliFunctionNotImplemented;
         }
@@ -3854,12 +3864,12 @@ namespace Sharp7
             return S7Consts.errCliFunctionNotImplemented;
         }
 
-        public int AsPlcCopyRamToRom(UInt32 Timeout)
+        public int AsPlcCopyRamToRom(uint Timeout)
         {
             return S7Consts.errCliFunctionNotImplemented;
         }
 
-        public int AsPlcCompress(UInt32 Timeout)
+        public int AsPlcCompress(uint Timeout)
         {
             return S7Consts.errCliFunctionNotImplemented;
         }
@@ -4854,7 +4864,7 @@ namespace Sharp7
         // S7 Drive Connection
         public int DrvConnectTo(string Address)
         {
-            UInt16 RemoteTSAP = (UInt16)((ConnType << 8) + (0 * 0x20) + 9);
+            var RemoteTSAP = (ushort)((ConnType << 8) + (0 * 0x20) + 9);
             // testen
             SetConnectionParams(Address, 0x0100, RemoteTSAP);
             return Connect();
@@ -4862,7 +4872,7 @@ namespace Sharp7
         // S7 Drive Connection with Slot
         public int DrvConnectTo(string Address, int Slot)
         {
-            UInt16 RemoteTSAP = (UInt16)((ConnType << 8) + (0 * 0x20) + Slot);
+            var RemoteTSAP = (ushort)((ConnType << 8) + (0 * 0x20) + Slot);
             // testen
             SetConnectionParams(Address, 0x0100, RemoteTSAP);
             return Connect();
@@ -4870,7 +4880,7 @@ namespace Sharp7
         // S7 Drive Connection with Rack & Slot
         public int DrvConnectTo(string Address, int Rack, int Slot)
         {
-            UInt16 RemoteTSAP = (UInt16)((ConnType << 8) + (Rack * 0x20) + Slot);
+            var RemoteTSAP = (ushort)((ConnType << 8) + (Rack * 0x20) + Slot);
             // testen
             SetConnectionParams(Address, 0x0100, RemoteTSAP);
             return Connect();
@@ -5297,7 +5307,7 @@ namespace Sharp7
         // S7 Nck Connection
         public int NckConnectTo(string Address)
         {
-            UInt16 RemoteTSAP = (UInt16)((ConnType << 8) + (0 * 0x20) + 3);
+            var RemoteTSAP = (ushort)((ConnType << 8) + (0 * 0x20) + 3);
             // testen
             SetConnectionParams(Address, 0x0100, RemoteTSAP);
             return Connect();
@@ -5305,7 +5315,7 @@ namespace Sharp7
         // S7 Nck Connection with Rack
         public int NckConnectTo(string Address, int Rack)
         {
-            UInt16 RemoteTSAP = (UInt16)((ConnType << 8) + (Rack * 0x20) + 3);
+            var RemoteTSAP = (ushort)((ConnType << 8) + (Rack * 0x20) + 3);
             // testen
             SetConnectionParams(Address, 0x0100, RemoteTSAP);
             return Connect();
@@ -5365,21 +5375,21 @@ namespace Sharp7
         {
             return DrvAdd(Tag.DONumber, Tag.ParameterNumber, Tag.WordLen, Tag.Start, Tag.Elements, ref Buffer);
         }
-        public bool DrvAdd<T>(Int32 DONumber, int ParameterNumber, int WordLen, int Start, ref T[] Buffer)
+        public bool DrvAdd<T>(int DONumber, int ParameterNumber, int WordLen, int Start, ref T[] Buffer)
         {
             int Amount = 1;
             return DrvAdd(DONumber, ParameterNumber, WordLen, Start, Amount, ref Buffer, 0);
         }
-        public bool DrvAdd<T>(Int32 DONumber, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer)
+        public bool DrvAdd<T>(int DONumber, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer)
         {
             return DrvAdd(DONumber, ParameterNumber, WordLen, Start, Amount, ref Buffer, 0);
         }
-        public bool DrvAdd<T>(Int32 DONumber, int ParameterNumber, int WordLen, int Start, ref T[] Buffer, int Offset)
+        public bool DrvAdd<T>(int DONumber, int ParameterNumber, int WordLen, int Start, ref T[] Buffer, int Offset)
         {
             int Amount = 1;
             return DrvAdd(DONumber, ParameterNumber, WordLen, Start, Amount, ref Buffer, Offset);
         }
-        public bool DrvAdd<T>(Int32 DONumber, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer, int Offset)
+        public bool DrvAdd<T>(int DONumber, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer, int Offset)
         {
 
             if (Count < S7Client.MaxVars)
@@ -5568,7 +5578,7 @@ namespace Sharp7
         {
             return (short)((Buffer[Pos] << 8) | Buffer[Pos + 1]);
         }
-        public static void SetIntAt(byte[] Buffer, int Pos, Int16 Value)
+        public static void SetIntAt(byte[] Buffer, int Pos, short Value)
         {
             Buffer[Pos] = (byte)(Value >> 8);
             Buffer[Pos + 1] = (byte)(Value & 0x00FF);
@@ -5606,11 +5616,11 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 16 bit unsigned value (S7 UInt) 0..65535
-        public static UInt16 GetUIntAt(byte[] Buffer, int Pos)
+        public static ushort GetUIntAt(byte[] Buffer, int Pos)
         {
-            return (UInt16)((Buffer[Pos] << 8) | Buffer[Pos + 1]);
+            return (ushort)((Buffer[Pos] << 8) | Buffer[Pos + 1]);
         }
-        public static void SetUIntAt(byte[] Buffer, int Pos, UInt16 Value)
+        public static void SetUIntAt(byte[] Buffer, int Pos, ushort Value)
         {
             Buffer[Pos] = (byte)(Value >> 8);
             Buffer[Pos + 1] = (byte)(Value & 0x00FF);
@@ -5618,16 +5628,16 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 32 bit unsigned value (S7 UDInt) 0..4294967296
-        public static UInt32 GetUDIntAt(byte[] Buffer, int Pos)
+        public static uint GetUDIntAt(byte[] Buffer, int Pos)
         {
-            UInt32 Result;
+            uint Result;
             Result = Buffer[Pos]; Result <<= 8;
             Result |= Buffer[Pos + 1]; Result <<= 8;
             Result |= Buffer[Pos + 2]; Result <<= 8;
             Result |= Buffer[Pos + 3];
             return Result;
         }
-        public static void SetUDIntAt(byte[] Buffer, int Pos, UInt32 Value)
+        public static void SetUDIntAt(byte[] Buffer, int Pos, uint Value)
         {
             Buffer[Pos + 3] = (byte)(Value & 0xFF);
             Buffer[Pos + 2] = (byte)((Value >> 8) & 0xFF);
@@ -5648,35 +5658,35 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 16 bit word (S7 Word) 16#0000..16#FFFF
-        public static UInt16 GetWordAt(byte[] Buffer, int Pos)
+        public static ushort GetWordAt(byte[] Buffer, int Pos)
         {
             return GetUIntAt(Buffer, Pos);
         }
-        public static void SetWordAt(byte[] Buffer, int Pos, UInt16 Value)
+        public static void SetWordAt(byte[] Buffer, int Pos, ushort Value)
         {
             SetUIntAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 32 bit word (S7 DWord) 16#00000000..16#FFFFFFFF
-        public static UInt32 GetDWordAt(byte[] Buffer, int Pos)
+        public static uint GetDWordAt(byte[] Buffer, int Pos)
         {
             return GetUDIntAt(Buffer, Pos);
         }
-        public static void SetDWordAt(byte[] Buffer, int Pos, UInt32 Value)
+        public static void SetDWordAt(byte[] Buffer, int Pos, uint Value)
         {
             SetUDIntAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 32 bit floating point number (S7 Real) (Range of Single)
-        public static Single GetRealAt(byte[] Buffer, int Pos)
+        public static float GetRealAt(byte[] Buffer, int Pos)
         {
-            UInt32 Value = GetUDIntAt(Buffer, Pos);
+            uint Value = GetUDIntAt(Buffer, Pos);
             byte[] bytes = BitConverter.GetBytes(Value);
             return BitConverter.ToSingle(bytes, 0);
         }
-        public static void SetRealAt(byte[] Buffer, int Pos, Single Value)
+        public static void SetRealAt(byte[] Buffer, int Pos, float Value)
         {
             byte[] FloatArray = BitConverter.GetBytes(Value);
             Buffer[Pos] = FloatArray[3];
@@ -5740,16 +5750,16 @@ namespace Sharp7
         {
             return NckAdd(Tag.NckArea, Tag.NckUnit, Tag.NckModule, Tag.ParameterNumber, Tag.WordLen, Tag.Start, Tag.Elements, ref Buffer);
         }
-        public bool NckAdd<T>(Int32 NckArea, int NckUnit, int NckModule, int ParameterNumber, int WordLen, int Start, ref T[] Buffer)
+        public bool NckAdd<T>(int NckArea, int NckUnit, int NckModule, int ParameterNumber, int WordLen, int Start, ref T[] Buffer)
         {
             int Amount = 1;
             return NckAdd(NckArea, NckUnit, NckModule, ParameterNumber, WordLen, Start, Amount, ref Buffer);
         }
-        public bool NckAdd<T>(Int32 NckArea, int NckUnit, int NckModule, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer)
+        public bool NckAdd<T>(int NckArea, int NckUnit, int NckModule, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer)
         {
             return NckAdd(NckArea, NckUnit, NckModule, ParameterNumber, WordLen, Start, Amount, ref Buffer, 0);
         }
-        public bool NckAdd<T>(Int32 NckArea, int NckUnit, int NckModule, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer, int Offset)
+        public bool NckAdd<T>(int NckArea, int NckUnit, int NckModule, int ParameterNumber, int WordLen, int Start, int Amount, ref T[] Buffer, int Offset)
         {
             if (Count < S7Client.MaxVars)
             {
@@ -5984,7 +5994,7 @@ namespace Sharp7
         {
             return (short)((Buffer[Pos + 1] << 8) | Buffer[Pos]);
         }
-        public static void SetIntAt(byte[] Buffer, int Pos, Int16 Value)
+        public static void SetIntAt(byte[] Buffer, int Pos, short Value)
         {
             Buffer[Pos + 1] = (byte)(Value >> 8);
             Buffer[Pos] = (byte)(Value & 0x00FF);
@@ -6011,9 +6021,9 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 64 bit signed value (S7 LInt) -9223372036854775808..9223372036854775807
-        public static Int64 GetLIntAt(byte[] Buffer, int Pos)
+        public static long GetLIntAt(byte[] Buffer, int Pos)
         {
-            Int64 Result;
+            long Result;
             Result = Buffer[Pos + 7]; Result <<= 8;
             Result += Buffer[Pos + 6]; Result <<= 8;
             Result += Buffer[Pos + 5]; Result <<= 8;
@@ -6024,7 +6034,7 @@ namespace Sharp7
             Result += Buffer[Pos];
             return Result;
         }
-        public static void SetLIntAt(byte[] Buffer, int Pos, Int64 Value)
+        public static void SetLIntAt(byte[] Buffer, int Pos, long Value)
         {
             Buffer[Pos] = (byte)(Value & 0xFF);
             Buffer[Pos + 1] = (byte)((Value >> 8) & 0xFF);
@@ -6049,11 +6059,11 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 16 bit unsigned value (S7 UInt) 0..65535
-        public static UInt16 GetUIntAt(byte[] Buffer, int Pos)
+        public static ushort GetUIntAt(byte[] Buffer, int Pos)
         {
-            return (UInt16)((Buffer[Pos + 1] << 8) | Buffer[Pos]);
+            return (ushort)((Buffer[Pos + 1] << 8) | Buffer[Pos]);
         }
-        public static void SetUIntAt(byte[] Buffer, int Pos, UInt16 Value)
+        public static void SetUIntAt(byte[] Buffer, int Pos, ushort Value)
         {
             Buffer[Pos + 1] = (byte)(Value >> 8);
             Buffer[Pos] = (byte)(Value & 0x00FF);
@@ -6061,16 +6071,16 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 32 bit unsigned value (S7 UDInt) 0..4294967296
-        public static UInt32 GetUDIntAt(byte[] Buffer, int Pos)
+        public static uint GetUDIntAt(byte[] Buffer, int Pos)
         {
-            UInt32 Result;
+            uint Result;
             Result = Buffer[Pos + 3]; Result <<= 8;
             Result |= Buffer[Pos + 2]; Result <<= 8;
             Result |= Buffer[Pos + 1]; Result <<= 8;
             Result |= Buffer[Pos];
             return Result;
         }
-        public static void SetUDIntAt(byte[] Buffer, int Pos, UInt32 Value)
+        public static void SetUDIntAt(byte[] Buffer, int Pos, uint Value)
         {
             Buffer[Pos] = (byte)(Value & 0xFF);
             Buffer[Pos + 1] = (byte)((Value >> 8) & 0xFF);
@@ -6080,9 +6090,9 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 64 bit unsigned value (S7 ULint) 0..18446744073709551616
-        public static UInt64 GetULIntAt(byte[] Buffer, int Pos)
+        public static ulong GetULIntAt(byte[] Buffer, int Pos)
         {
-            UInt64 Result;
+            ulong Result;
             Result = Buffer[Pos + 7]; Result <<= 8;
             Result |= Buffer[Pos + 6]; Result <<= 8;
             Result |= Buffer[Pos + 5]; Result <<= 8;
@@ -6093,7 +6103,7 @@ namespace Sharp7
             Result |= Buffer[Pos];
             return Result;
         }
-        public static void SetULintAt(byte[] Buffer, int Pos, UInt64 Value)
+        public static void SetULintAt(byte[] Buffer, int Pos, ulong Value)
         {
             Buffer[Pos + 7] = (byte)(Value & 0xFF);
             Buffer[Pos + 6] = (byte)((Value >> 8) & 0xFF);
@@ -6118,47 +6128,47 @@ namespace Sharp7
         #endregion
 
         #region Get/Set 16 bit word (S7 Word) 16#0000..16#FFFF
-        public static UInt16 GetWordAt(byte[] Buffer, int Pos)
+        public static ushort GetWordAt(byte[] Buffer, int Pos)
         {
             return GetUIntAt(Buffer, Pos);
         }
-        public static void SetWordAt(byte[] Buffer, int Pos, UInt16 Value)
+        public static void SetWordAt(byte[] Buffer, int Pos, ushort Value)
         {
             SetUIntAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 32 bit word (S7 DWord) 16#00000000..16#FFFFFFFF
-        public static UInt32 GetDWordAt(byte[] Buffer, int Pos)
+        public static uint GetDWordAt(byte[] Buffer, int Pos)
         {
             return GetUDIntAt(Buffer, Pos);
         }
-        public static void SetDWordAt(byte[] Buffer, int Pos, UInt32 Value)
+        public static void SetDWordAt(byte[] Buffer, int Pos, uint Value)
         {
             SetUDIntAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 64 bit word (S7 LWord) 16#0000000000000000..16#FFFFFFFFFFFFFFFF
-        public static UInt64 GetLWordAt(byte[] Buffer, int Pos)
+        public static ulong GetLWordAt(byte[] Buffer, int Pos)
         {
 
             return GetULIntAt(Buffer, Pos);
         }
-        public static void SetLWordAt(byte[] Buffer, int Pos, UInt64 Value)
+        public static void SetLWordAt(byte[] Buffer, int Pos, ulong Value)
         {
             SetULintAt(Buffer, Pos, Value);
         }
         #endregion
 
         #region Get/Set 64 bit floating point number (S7 LReal) (Range of Double)
-        public static Double GetLRealAt(byte[] Buffer, int Pos)
+        public static double GetLRealAt(byte[] Buffer, int Pos)
         {
-            UInt64 Value = GetULIntAt(Buffer, Pos);
+            ulong Value = GetULIntAt(Buffer, Pos);
             byte[] bytes = BitConverter.GetBytes(Value);
             return BitConverter.ToDouble(bytes, 0);
         }
-        public static void SetLRealAt(byte[] Buffer, int Pos, Double Value)
+        public static void SetLRealAt(byte[] Buffer, int Pos, double Value)
         {
             byte[] FloatArray = BitConverter.GetBytes(Value);
             Buffer[Pos + 7] = FloatArray[7];

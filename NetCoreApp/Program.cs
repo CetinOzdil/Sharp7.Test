@@ -7,10 +7,10 @@ namespace NetCoreApp
     internal class Program
     {
         //static string plcIp = "127.0.0.1"; // Snap7 Server
-        //static string plcIp = "10.90.233.181"; //S7-1214
-        static string plcIp = "192.168.1.10"; //S7-410
+        static string plcIp = "10.90.233.181"; //S7-1214
+        //static string plcIp = "192.168.1.10"; //S7-410
         static int plcRack = 0;
-        static int plcSlot = 3;
+        static int plcSlot = 0;
 
         static void Main(string[] args)
         {
