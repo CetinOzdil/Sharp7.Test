@@ -811,14 +811,14 @@ namespace Sharp7
 
             if (Value < 128)
                 return Value;
-            else
-                return (Value - 256);
+
+            return (Value - 256);
         }
         public static void SetSIntAt(byte[] Buffer, int Pos, int Value)
         {
             if (Value < -128)
                 Value = -128;
-            else if (Value > 127) 
+            else if (Value > 127)
                 Value = 127;
 
             Buffer[Pos] = (byte)Value;
@@ -842,11 +842,11 @@ namespace Sharp7
         public static int GetDIntAt(byte[] Buffer, int Pos)
         {
             int Result;
-            Result = Buffer[Pos]; 
+            Result = Buffer[Pos];
             Result <<= 8;
-            Result += Buffer[Pos + 1]; 
+            Result += Buffer[Pos + 1];
             Result <<= 8;
-            Result += Buffer[Pos + 2]; 
+            Result += Buffer[Pos + 2];
             Result <<= 8;
             Result += Buffer[Pos + 3];
             return Result;
@@ -1005,8 +1005,7 @@ namespace Sharp7
         #region Get/Set 32 bit floating point number (S7 Real) (Range of Single)
         public static float GetRealAt(byte[] Buffer, int Pos)
         {
-            uint Value = GetUDIntAt(Buffer, Pos);
-            byte[] bytes = BitConverter.GetBytes(Value);
+            var bytes = new byte[] { Buffer[Pos + 3], Buffer[Pos + 2], Buffer[Pos + 1], Buffer[Pos] };
             return BitConverter.ToSingle(bytes, 0);
         }
 
@@ -1023,8 +1022,7 @@ namespace Sharp7
         #region Get/Set 64 bit floating point number (S7 LReal) (Range of Double)
         public static double GetLRealAt(byte[] Buffer, int Pos)
         {
-            ulong Value = GetULIntAt(Buffer, Pos);
-            byte[] bytes = BitConverter.GetBytes(Value);
+            var bytes = new byte[] { Buffer[Pos + 7], Buffer[Pos + 6], Buffer[Pos + 5], Buffer[Pos + 4], Buffer[Pos + 3], Buffer[Pos + 2], Buffer[Pos + 1], Buffer[Pos] };
             return BitConverter.ToDouble(bytes, 0);
         }
         public static void SetLRealAt(byte[] Buffer, int Pos, double Value)
@@ -5560,15 +5558,19 @@ namespace Sharp7
         public static int GetSIntAt(byte[] Buffer, int Pos)
         {
             int Value = Buffer[Pos];
+
             if (Value < 128)
                 return Value;
-            else
-                return (Value - 256);
+
+            return (Value - 256);
         }
         public static void SetSIntAt(byte[] Buffer, int Pos, int Value)
         {
-            if (Value < -128) Value = -128;
-            if (Value > 127) Value = 127;
+            if (Value < -128)
+                Value = -128;
+            else if (Value > 127)
+                Value = 127;
+
             Buffer[Pos] = (byte)Value;
         }
         #endregion
@@ -5682,8 +5684,7 @@ namespace Sharp7
         #region Get/Set 32 bit floating point number (S7 Real) (Range of Single)
         public static float GetRealAt(byte[] Buffer, int Pos)
         {
-            uint Value = GetUDIntAt(Buffer, Pos);
-            byte[] bytes = BitConverter.GetBytes(Value);
+            var bytes = new byte[] { Buffer[Pos + 3], Buffer[Pos + 2], Buffer[Pos + 1], Buffer[Pos] };
             return BitConverter.ToSingle(bytes, 0);
         }
         public static void SetRealAt(byte[] Buffer, int Pos, float Value)
@@ -5978,13 +5979,16 @@ namespace Sharp7
             int Value = Buffer[Pos];
             if (Value < 128)
                 return Value;
-            else
-                return (Value - 256);
+
+            return (Value - 256);
         }
         public static void SetSIntAt(byte[] Buffer, int Pos, int Value)
         {
-            if (Value < -128) Value = -128;
-            if (Value > 127) Value = 127;
+            if (Value < -128)
+                Value = -128;
+            else if (Value > 127)
+                Value = 127;
+
             Buffer[Pos] = (byte)Value;
         }
         #endregion
@@ -6164,8 +6168,7 @@ namespace Sharp7
         #region Get/Set 64 bit floating point number (S7 LReal) (Range of Double)
         public static double GetLRealAt(byte[] Buffer, int Pos)
         {
-            ulong Value = GetULIntAt(Buffer, Pos);
-            byte[] bytes = BitConverter.GetBytes(Value);
+            var bytes = new byte[] { Buffer[Pos + 7], Buffer[Pos + 6], Buffer[Pos + 5], Buffer[Pos + 4], Buffer[Pos + 3], Buffer[Pos + 2], Buffer[Pos + 1], Buffer[Pos] };
             return BitConverter.ToDouble(bytes, 0);
         }
         public static void SetLRealAt(byte[] Buffer, int Pos, double Value)
